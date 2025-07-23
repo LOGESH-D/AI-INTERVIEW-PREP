@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
 import logo from '/AI-PREPIFY.png';
 import { toast } from 'react-toastify';
+import { FaBars, FaTimes } from 'react-icons/fa';
 
 const NavBar = ({ onContactClick, onLoginClick, onRegisterClick }) => {
   const { token, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -14,13 +16,19 @@ const NavBar = ({ onContactClick, onLoginClick, onRegisterClick }) => {
     toast.success('sucessfully loged out');
   };
 
+  const handleToggleMenu = () => setMenuOpen((prev) => !prev);
+  const handleLinkClick = (cb) => {
+    setMenuOpen(false);
+    if (cb) cb();
+  };
+
   return (
     <nav
-      className={`flex flex-wrap items-center justify-between px-2 py-1 mt-2 mx-2 shadow-md transition-all duration-500 bg-gradient-to-r from-[#1e293b] to-[#3b82f6]`}
+      className={`flex items-center justify-between px-2 py-1 mt-2 mx-2 shadow-md transition-all duration-500 bg-gradient-to-r from-[#1e293b] to-[#3b82f6] relative z-50`}
       style={{ fontFamily: 'Poppins, Inter, Arial, sans-serif', position: 'sticky', top: '0.5rem', zIndex: 50 }}
     >
       {/* Logo */}
-      <Link to="/" className="flex items-center gap-2 animate-fade-in group" style={{ textDecoration: 'none' }}>
+      <Link to="/" className="flex items-center gap-2 animate-fade-in group" style={{ textDecoration: 'none' }} onClick={() => setMenuOpen(false)}>
         <img
           src={logo}
           alt="AI Prepify Logo"
@@ -30,20 +38,35 @@ const NavBar = ({ onContactClick, onLoginClick, onRegisterClick }) => {
           AI-PREPIFY
         </span>
       </Link>
+      {/* Hamburger for mobile */}
+      <button
+        className="md:hidden ml-auto text-white text-2xl p-2 focus:outline-none"
+        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+        onClick={handleToggleMenu}
+      >
+        {menuOpen ? <FaTimes /> : <FaBars />}
+      </button>
       {/* Links */}
-      <div className="flex flex-wrap items-center gap-2 md:gap-6 animate-fade-in">
+      <div
+        className={`
+          flex-col md:flex-row md:flex items-start md:items-center gap-2 md:gap-6 animate-fade-in
+          fixed md:static top-16 left-0 w-full md:w-auto bg-gradient-to-r from-[#1e293b] to-[#3b82f6] md:bg-none shadow-lg md:shadow-none transition-all duration-150
+          ${menuOpen ? 'flex' : 'hidden'} md:flex
+        `}
+        style={{ zIndex: 100 }}
+      >
         {token ? (
           <>
-            <Link to="/interviews" className="nav-link">Interviews</Link>
-            <Link to="/profile" className="nav-link">Profile</Link>
-            <button className="nav-link text-base font-semibold" onClick={onContactClick}>Contact</button>
-            <button onClick={handleLogout} className="nav-link">Logout</button>
+            <Link to="/interviews" className="nav-link" onClick={() => handleLinkClick()}>Interviews</Link>
+            <Link to="/profile" className="nav-link" onClick={() => handleLinkClick()}>Profile</Link>
+            <button className="nav-link text-base font-semibold" onClick={() => handleLinkClick(onContactClick)}>Contact</button>
+            <button onClick={() => { handleLinkClick(); handleLogout(); }} className="nav-link">Logout</button>
           </>
         ) : (
           <>
-            <button className="nav-link" onClick={onLoginClick}>Login</button>
-            <button className="nav-link" onClick={onRegisterClick}>Register</button>
-            <button className="nav-link text-base font-semibold" onClick={onContactClick}>Contact</button>
+            <button className="nav-link" onClick={() => handleLinkClick(onLoginClick)}>Login</button>
+            <button className="nav-link" onClick={() => handleLinkClick(onRegisterClick)}>Register</button>
+            <button className="nav-link text-base font-semibold" onClick={() => handleLinkClick(onContactClick)}>Contact</button>
           </>
         )}
       </div>
@@ -80,17 +103,16 @@ const NavBar = ({ onContactClick, onLoginClick, onRegisterClick }) => {
         }
         @media (max-width: 600px) {
           nav {
-            flex-direction: column;
-            align-items: flex-start;
+            flex-direction: row;
+            align-items: center;
             padding: 0.5rem 0.2rem;
           }
-          .flex.items-center {
-            flex-direction: row;
-            gap: 0.5rem !important;
-          }
           .nav-link {
-            font-size: 0.9rem;
-            padding: 0.25rem 0.5rem;
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            width: 100%;
+            display: block;
+            text-align: left;
           }
         }
         .animate-fade-in {

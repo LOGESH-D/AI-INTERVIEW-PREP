@@ -75,7 +75,7 @@ const Hero = ({ onRegisterClick }) => {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-blue-100 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-blue-100 overflow-x-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full opacity-20 animate-pulse"></div>
@@ -91,16 +91,16 @@ const Hero = ({ onRegisterClick }) => {
         </div>
       </div>
 
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative z-10 px-2 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
         {/* Hero Section */}
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10 sm:mb-16">
             <div className="relative flex flex-col items-center">
               <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6 shadow-lg">
                 <FaRocket className="animate-bounce" />
                 <span>AI-Powered Interview Platform</span>
               </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 mb-6 leading-tight">
+              <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 mb-4 sm:mb-6 leading-tight">
                 Master Your Next
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
@@ -109,12 +109,12 @@ const Hero = ({ onRegisterClick }) => {
               </h1>
             </div>
             
-            <p className="text-lg sm:text-xl lg:text-2xl text-gray-700 mb-8 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-base xs:text-lg sm:text-xl lg:text-2xl text-gray-700 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed">
               Practice with AI-powered mock interviews, get instant feedback, and boost your confidence. 
               Transform your interview skills with personalized analytics and expert guidance.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12">
               <button
                 className="group bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-purple-500/25 hover:scale-105 transition-all duration-300 flex items-center gap-3"
                 onClick={handleGetStarted}
@@ -132,7 +132,7 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* Stats Section */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10 sm:mb-16">
             {stats.map((stat, index) => (
               <div key={index} className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-white/50">
                 <stat.icon className="text-3xl text-purple-600 mx-auto mb-3" />
@@ -143,9 +143,9 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* Dashboard Preview */}
-          <div className="mb-16 relative">
+          <div className="mb-10 sm:mb-16 relative">
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-1 shadow-2xl">
-              <div className="bg-white rounded-3xl p-8 relative overflow-hidden">
+              <div className="bg-white rounded-3xl p-4 sm:p-8 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-500 to-blue-500"></div>
                 <img 
                   src="/dash.png" 
@@ -158,15 +158,15 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* About Section */}
-          <div className="mb-16" id="about">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-2xl border border-white/50">
-              <div className="text-center mb-8">
+          <div className="mb-10 sm:mb-16" id="about">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-4 sm:p-12 shadow-2xl border border-white/50">
+              <div className="text-center mb-6 sm:mb-8">
                 <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 mb-4">
                   About This Platform
                 </h2>
                 <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full"></div>
               </div>
-              <p className="text-lg sm:text-xl text-gray-700 leading-relaxed text-center max-w-4xl mx-auto">
+              <p className="text-base xs:text-lg sm:text-xl text-gray-700 leading-relaxed text-center max-w-4xl mx-auto">
                 Our cutting-edge platform harnesses the power of artificial intelligence to create realistic interview scenarios, 
                 provide instant comprehensive feedback, and track your progress with detailed analytics. Whether you're a fresh graduate, 
                 career changer, or seasoned professional, our AI-driven approach helps you practice effectively and build unshakeable confidence.
@@ -175,14 +175,14 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* Features Section */}
-          <div className="mb-16" id="features">
-            <div className="text-center mb-12">
+          <div className="mb-10 sm:mb-16" id="features">
+            <div className="text-center mb-8 sm:mb-12">
               <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 mb-4">
                 Powerful Features
               </h2>
               <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full"></div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {features.map((feature, index) => (
                 <div key={index} className="group bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-white/50">
                   <div className="flex items-center gap-4 mb-4">
@@ -199,16 +199,16 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* Goals Section */}
-          <div className="mb-16" id="mission">
+          <div className="mb-10 sm:mb-16" id="mission">
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-1 shadow-2xl">
-              <div className="bg-white rounded-3xl p-8 sm:p-12">
-                <div className="text-center mb-8">
+              <div className="bg-white rounded-3xl p-4 sm:p-12">
+                <div className="text-center mb-6 sm:mb-8">
                   <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 mb-4">
                     Our Mission
                   </h2>
                   <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full"></div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   {goals.map((goal, index) => (
                     <div key={index} className="flex items-start gap-4 p-6 bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl border border-purple-100 hover:shadow-lg transition-all duration-300">
                       <div className="p-3 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl text-white shadow-lg">
@@ -225,15 +225,15 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* Requirements Section */}
-          <div className="mb-16">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-2xl border border-white/50">
-              <div className="text-center mb-8">
+          <div className="mb-10 sm:mb-16">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-4 sm:p-12 shadow-2xl border border-white/50">
+              <div className="text-center mb-6 sm:mb-8">
                 <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 mb-4">
                   System Requirements
                 </h2>
                 <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full"></div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {requirements.map((req, index) => (
                   <div key={index} className="flex flex-col items-center text-center p-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
                     <div className="p-4 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl text-white mb-4 shadow-lg">
@@ -249,15 +249,15 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* Meet our Team Section */}
-          <div className="mb-16" id="team">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-2xl border border-white/50">
-              <div className="text-center mb-8">
+          <div className="mb-10 sm:mb-16" id="team">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-4 sm:p-12 shadow-2xl border border-white/50">
+              <div className="text-center mb-6 sm:mb-8">
                 <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-4">
                   Meet our Team
                 </h2>
                 <div className="w-20 h-1 bg-gradient-to-r from-pink-500 to-purple-500 mx-auto rounded-full"></div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
                 {/* Team Member 1 */}
                 <div className="flex flex-col items-center bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-pink-100 shadow-md hover:shadow-lg transition-all duration-300">
                   <img src="/Logesh.png" alt="Logesh" className="w-28 h-28 rounded-full object-cover border-4 border-purple-300 shadow-lg mb-4" />
@@ -283,9 +283,9 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* Reviews Section */}
-          <div className="mb-16">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-2xl border border-white/50">
-              <div className="text-center mb-8">
+          <div className="mb-10 sm:mb-16">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-4 sm:p-12 shadow-2xl border border-white/50">
+              <div className="text-center mb-6 sm:mb-8">
                 <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 mb-4">
                   Reviews
                 </h2>
@@ -304,7 +304,7 @@ const Hero = ({ onRegisterClick }) => {
                 autoplay={{ delay: 0, disableOnInteraction: false, pauseOnMouseEnter: false }}
                 speed={8000}
                 loop={true}
-                className="w-full continuous-swiper"
+                className="w-full continuous-swiper min-w-0"
               >
                 {/* 10 Review Slides */}
                 {[
@@ -360,7 +360,7 @@ const Hero = ({ onRegisterClick }) => {
                   },
                 ].map((profile, idx) => (
                   <SwiperSlide key={idx}>
-                    <div className="flex flex-col items-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100 shadow-md mx-2 h-full">
+                    <div className="flex flex-col items-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 sm:p-8 border border-blue-100 shadow-md mx-1 sm:mx-2 h-full">
                       <img src={profile.img} alt={profile.name} className="w-20 h-20 rounded-full object-cover border-4 border-blue-300 shadow-lg mb-4" />
                       <div className="text-lg font-semibold text-gray-800 mb-2">{profile.name}</div>
                       <p className="text-gray-700 text-center text-base">"{profile.review}"</p>
@@ -372,14 +372,14 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* Call to Action */}
-          <div className="text-center bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-8 sm:p-12 text-white shadow-2xl" id="contact">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+          <div className="text-center bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-4 sm:p-12 text-white shadow-2xl" id="contact">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">
               Ready to Ace Your Next Interview?
             </h2>
-            <p className="text-lg sm:text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg mb-6 sm:mb-8 opacity-90 max-w-2xl mx-auto">
               Join thousands of successful candidates who've transformed their interview skills with our AI-powered platform.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
               <button
                 className="group bg-white text-purple-600 px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-3"
                 onClick={handleGetStarted}

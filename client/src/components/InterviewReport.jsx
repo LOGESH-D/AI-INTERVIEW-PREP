@@ -10,11 +10,13 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import { FaBars, FaTimes } from 'react-icons/fa';
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 const InterviewReport = ({ report, overallScore, reportLoading, interview }) => {
   const [feedbackTab, setFeedbackTab] = useState('overall');
   const [openQuestion, setOpenQuestion] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   // Calculate average skill scores
@@ -266,9 +268,9 @@ const InterviewReport = ({ report, overallScore, reportLoading, interview }) => 
                 </div>
               </div>
               {/* Personalized Improvement Plan */}
-              <div className="bg-white rounded-xl shadow p-6 mt-8">
-                <h3 className="text-2xl font-bold mb-4 text-[#3b3bb3]">Personalized Improvement Plan</h3>
-                <ul className="list-disc list-inside text-gray-800 text-base space-y-2">
+              <div className="bg-white rounded-xl shadow p-4 sm:p-6 mt-6 sm:mt-8">
+                <h3 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-4 text-[#3b3bb3]">Personalized Improvement Plan</h3>
+                <ul className="list-disc list-inside text-gray-800 text-xs sm:text-base space-y-1 sm:space-y-2">
                   {/* Analyze lowest scoring areas and generate recommendations */}
                   {(() => {
                     const recs = [];
