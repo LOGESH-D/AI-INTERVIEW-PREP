@@ -21,6 +21,10 @@ import {
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/autoplay';
+import { Autoplay } from 'swiper/modules';
 
 const features = [
   { icon: FaRocket, text: 'AI-powered mock interviews', color: 'text-blue-500' },
@@ -154,7 +158,7 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* About Section */}
-          <div className="mb-16">
+          <div className="mb-16" id="about">
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-2xl border border-white/50">
               <div className="text-center mb-8">
                 <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 mb-4">
@@ -171,7 +175,7 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* Features Section */}
-          <div className="mb-16">
+          <div className="mb-16" id="features">
             <div className="text-center mb-12">
               <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 mb-4">
                 Powerful Features
@@ -195,7 +199,7 @@ const Hero = ({ onRegisterClick }) => {
           </div>
 
           {/* Goals Section */}
-          <div className="mb-16">
+          <div className="mb-16" id="mission">
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-1 shadow-2xl">
               <div className="bg-white rounded-3xl p-8 sm:p-12">
                 <div className="text-center mb-8">
@@ -244,8 +248,131 @@ const Hero = ({ onRegisterClick }) => {
             </div>
           </div>
 
+          {/* Meet our Team Section */}
+          <div className="mb-16" id="team">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-2xl border border-white/50">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-4">
+                  Meet our Team
+                </h2>
+                <div className="w-20 h-1 bg-gradient-to-r from-pink-500 to-purple-500 mx-auto rounded-full"></div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {/* Team Member 1 */}
+                <div className="flex flex-col items-center bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-pink-100 shadow-md hover:shadow-lg transition-all duration-300">
+                  <img src="/Logesh.png" alt="Logesh" className="w-28 h-28 rounded-full object-cover border-4 border-purple-300 shadow-lg mb-4" />
+                  <div className="text-lg font-semibold text-gray-800">Logesh</div>
+                </div>
+                {/* Team Member 2 */}
+                <div className="flex flex-col items-center bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-pink-100 shadow-md hover:shadow-lg transition-all duration-300">
+                  <img src="/Nishanth.jpg" alt="Nishanth" className="w-28 h-28 rounded-full object-cover border-4 border-purple-300 shadow-lg mb-4" />
+                  <div className="text-lg font-semibold text-gray-800">Nishanth</div>
+                </div>
+                {/* Team Member 3 */}
+                <div className="flex flex-col items-center bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-pink-100 shadow-md hover:shadow-lg transition-all duration-300">
+                  <img src="/Perunarkilli.jpg" alt="Perunarkilli" className="w-28 h-28 rounded-full object-cover border-4 border-purple-300 shadow-lg mb-4" />
+                  <div className="text-lg font-semibold text-gray-800">Perunarkilli</div>
+                </div>
+                {/* Team Member 4 */}
+                <div className="flex flex-col items-center bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-pink-100 shadow-md hover:shadow-lg transition-all duration-300">
+                  <img src="/Nithin-Akash.jpg" alt="Nithin Akash" className="w-28 h-28 rounded-full object-cover border-4 border-purple-300 shadow-lg mb-4" />
+                  <div className="text-lg font-semibold text-gray-800">Nithin Akash</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Reviews Section */}
+          <div className="mb-16">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-2xl border border-white/50">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 mb-4">
+                  Reviews
+                </h2>
+                <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+              </div>
+              <Swiper
+                modules={[Autoplay]}
+                spaceBetween={30}
+                slidesPerView={1}
+                breakpoints={{
+                  640: { slidesPerView: 1 },
+                  768: { slidesPerView: 2 },
+                  1024: { slidesPerView: 3 },
+                  1280: { slidesPerView: 4 },
+                }}
+                autoplay={{ delay: 0, disableOnInteraction: false, pauseOnMouseEnter: false }}
+                speed={8000}
+                loop={true}
+                className="w-full continuous-swiper"
+              >
+                {/* 10 Review Slides */}
+                {[
+                  {
+                    name: 'Alex',
+                    img: 'https://randomuser.me/api/portraits/men/12.jpg',
+                    review: 'The AI feedback was spot on and helped me land my dream job!'
+                  },
+                  {
+                    name: 'Maria',
+                    img: 'https://randomuser.me/api/portraits/women/25.jpg',
+                    review: 'Amazing platform for interview practice. The analytics are super helpful.'
+                  },
+                  {
+                    name: 'John',
+                    img: 'https://randomuser.me/api/portraits/men/45.jpg',
+                    review: 'I loved the instant feedback and the realistic mock interviews.'
+                  },
+                  {
+                    name: 'Sara',
+                    img: 'https://randomuser.me/api/portraits/women/36.jpg',
+                    review: 'Great for building confidence before real interviews!'
+                  },
+                  {
+                    name: 'Priya',
+                    img: 'https://randomuser.me/api/portraits/women/44.jpg',
+                    review: 'The body language analysis was a game changer for me.'
+                  },
+                  {
+                    name: 'Rahul',
+                    img: 'https://randomuser.me/api/portraits/men/32.jpg',
+                    review: 'Very user-friendly and the feedback is detailed and actionable.'
+                  },
+                  {
+                    name: 'Sneha',
+                    img: 'https://randomuser.me/api/portraits/women/68.jpg',
+                    review: 'Helped me improve my communication skills a lot!'
+                  },
+                  {
+                    name: 'Arjun',
+                    img: 'https://randomuser.me/api/portraits/men/65.jpg',
+                    review: 'The platform is intuitive and the AI is impressive.'
+                  },
+                  {
+                    name: 'Meera',
+                    img: 'https://randomuser.me/api/portraits/women/12.jpg',
+                    review: 'I recommend this to all my friends preparing for interviews.'
+                  },
+                  {
+                    name: 'Vikram',
+                    img: 'https://randomuser.me/api/portraits/men/41.jpg',
+                    review: 'The best mock interview experience I have had online.'
+                  },
+                ].map((profile, idx) => (
+                  <SwiperSlide key={idx}>
+                    <div className="flex flex-col items-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100 shadow-md mx-2 h-full">
+                      <img src={profile.img} alt={profile.name} className="w-20 h-20 rounded-full object-cover border-4 border-blue-300 shadow-lg mb-4" />
+                      <div className="text-lg font-semibold text-gray-800 mb-2">{profile.name}</div>
+                      <p className="text-gray-700 text-center text-base">"{profile.review}"</p>
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          </div>
+
           {/* Call to Action */}
-          <div className="text-center bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-8 sm:p-12 text-white shadow-2xl">
+          <div className="text-center bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-8 sm:p-12 text-white shadow-2xl" id="contact">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
               Ready to Ace Your Next Interview?
             </h2>
@@ -269,6 +396,11 @@ const Hero = ({ onRegisterClick }) => {
           </div>
         </div>
       </div>
+      <style>{`
+  .continuous-swiper .swiper-wrapper {
+    transition-timing-function: linear !important;
+  }
+`}</style>
     </div>
   );
 };

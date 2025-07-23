@@ -19,10 +19,11 @@ const Footer = () => {
         <div>
           <h3 className="font-bold mb-3 uppercase tracking-wide">About</h3>
           <ul className="space-y-2 text-[#7c5c53]">
-            <li><a href="/about" className="hover:underline">Our Mission</a></li>
-            <li><a href="/team" className="hover:underline">Meet the Team</a></li>
-            <li><a href="/contact" className="hover:underline">Contact Us</a></li>
-            <li><a href="https://github.com/your-repo" target="_blank" rel="noopener noreferrer" className="hover:underline">GitHub</a></li>
+          <li><a href="#about" className="hover:underline">About this Platform</a></li>
+            <li><a href="#mission" className="hover:underline">Our Mission</a></li>
+            <li><a href="#team" className="hover:underline">Meet the Team</a></li>
+            <li><a href="#features" className="hover:underline">Powerful Features</a></li>
+            
           </ul>
         </div>
         {/* RESOURCES */}
@@ -32,7 +33,7 @@ const Footer = () => {
             <li><a href="https://www.linkedin.com/in/logesh-d-6a155a265?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" className="hover:underline">Logesh</a></li>
             <li><a href="https://www.linkedin.com/in/nishanth1414?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" className="hover:underline">Nishanth</a></li>
             <li><a href="https://www.linkedin.com/in/nithin-akash-49588530a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" className="hover:underline">Nithin Akash</a></li>
-            <li><a href="https://www.linkedin.com/in/perunarkilli-g-5b63a72b4?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" className="hover:underline">Perunar Killi</a></li>
+            <li><a href="https://www.linkedin.com/in/perunarkilli-g-5b63a72b4?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" className="hover:underline">Perunarkilli</a></li>
           </ul>
         </div>
         {/* STAY CONNECTED */}
