@@ -27,12 +27,12 @@ const Footer = () => {
         </div>
         {/* RESOURCES */}
         <div>
-          <h3 className="font-bold mb-3 uppercase tracking-wide">Resources</h3>
+          <h3 className="font-bold mb-3 uppercase tracking-wide">Our Team</h3>
           <ul className="space-y-2 text-[#7c5c53]">
-            <li><a href="/faq" className="hover:underline">FAQ</a></li>
-            <li><a href="/blog" className="hover:underline">Blog</a></li>
-            <li><a href="/privacy" className="hover:underline">Privacy Policy</a></li>
-            <li><a href="/terms" className="hover:underline">Terms of Service</a></li>
+            <li><a href="https://www.linkedin.com/in/logesh-d-6a155a265?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" className="hover:underline">Logesh</a></li>
+            <li><a href="https://www.linkedin.com/in/nishanth1414?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" className="hover:underline">Nishanth</a></li>
+            <li><a href="https://www.linkedin.com/in/nithin-akash-49588530a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" className="hover:underline">Nithin Akash</a></li>
+            <li><a href="https://www.linkedin.com/in/perunarkilli-g-5b63a72b4?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" className="hover:underline">Perunar Killi</a></li>
           </ul>
         </div>
         {/* STAY CONNECTED */}
