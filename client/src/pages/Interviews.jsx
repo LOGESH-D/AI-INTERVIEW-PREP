@@ -174,7 +174,11 @@ const Interviews = () => {
       </div>
       <NewInterviewModal open={showModal} onClose={() => setShowModal(false)} onStart={handleStartInterview} />
       <HumanInterviewBookingModal open={showHumanBooking} onClose={() => setShowHumanBooking(false)} onBook={() => { setShowHumanBooking(false); setShowAppointmentModal(true); }} />
-      <SubscriptionPlans open={showAppointmentModal} onClose={() => setShowAppointmentModal(false)} />
+      <SubscriptionPlans 
+        open={showAppointmentModal} 
+        onClose={() => setShowAppointmentModal(false)} 
+        onBack={() => { setShowAppointmentModal(false); setShowHumanBooking(true); }}
+      />
       {/* Horizontal Menu Slider for Interview History */}
       <div className="w-full flex justify-center mb-6">
         <div className="flex w-full rounded-lg bg-gray-100 overflow-hidden shadow divide-x divide-gray-200">
