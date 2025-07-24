@@ -15,6 +15,7 @@ import RegisterModal from './pages/Register';
 import Profile from './pages/Profile';
 import Footer from './components/Footer';
 import MinimalFooter from './components/MinimalFooter';
+import Payment from './pages/Payment';
 
 const PrivateRoute = ({ children }) => {
   const { token } = useContext(AuthContext);
@@ -41,6 +42,7 @@ function App() {
         <Route path="/new-interview" element={<PrivateRoute><NewInterview /></PrivateRoute>} />
         <Route path="/questions/:id" element={<PrivateRoute><Questions /></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        <Route path="/payment" element={<Payment />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       <ContactModal open={showContact} onClose={() => setShowContact(false)} />
