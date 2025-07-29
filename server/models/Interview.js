@@ -22,7 +22,7 @@ const interviewSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'in-progress', 'completed'],
+    enum: ['pending', 'in-progress', 'completed', 'scheduled'],
     default: 'pending'
   },
   questions: [{
@@ -49,7 +49,39 @@ const interviewSchema = new mongoose.Schema({
   skills: [{
     type: String,
     trim: true
-  }]
+  }],
+  // Live interview specific fields
+  specialist: {
+    type: Boolean,
+    default: false
+  },
+  humanSpecialist: {
+    type: Boolean,
+    default: false
+  },
+  roomName: {
+    type: String,
+    trim: true
+  },
+  scheduledAt: {
+    type: Date
+  },
+  completedAt: {
+    type: Date
+  },
+  duration: {
+    type: Number, // Duration in seconds
+    default: 0
+  },
+  interviewerFeedback: {
+    type: String,
+    trim: true
+  },
+  overallRating: {
+    type: Number,
+    min: 1,
+    max: 5
+  }
 }, {
   timestamps: true
 });

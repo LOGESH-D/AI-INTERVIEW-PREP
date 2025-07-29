@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LiveInterviewRoom from './LiveInterviewRoom';
+import InterviewRoomLink from './InterviewRoomLink';
+import API from '../api';
 
 const planDetails = {
   Single: {
@@ -23,17 +26,142 @@ const planDetails = {
 };
 
 // PaymentModal: onBack should navigate to the previous popup (e.g., HumanInterviewBookingModal)
-const PaymentModal = ({ open, plan, onClose, onBack }) => {
+const PaymentModal = ({ open, plan, onClose, onBack, interviewData }) => {
   const details = planDetails[plan] || planDetails.Single;
   const [form, setForm] = useState({ name: '', email: '', card: '', expiry: '', cvv: '' });
   const [success, setSuccess] = useState(false);
+  const [showVideoRoom, setShowVideoRoom] = useState(false);
+  const [roomName, setRoomName] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-  const handleSubmit = e => {
+  
+  const sendInterviewerEmail = async (roomName) => {
+    try {
+      // Fix: Use the correct Jitsi Meet URL format without authentication
+      const roomUrl = `https://meet.jit.si/${roomName}#config.startWithAudioMuted=false&config.startWithVideoMuted=false&config.prejoinPageEnabled=false&config.requireDisplayName=false&config.disableModeratorIndicator=true&config.enableClosePage=false&config.enableWelcomePage=false&config.enableLobbyChat=false&config.enableKnocking=false&config.enablePrejoinPage=false`;
+      const emailData = {
+        to: 'logeshofficial333@gmail.com',
+        subject: '🚨 URGENT: New Mock Interview Session - Join Now',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 2px solid #2563eb; border-radius: 10px;">
+            <div style="background: #2563eb; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
+              <h1 style="margin: 0; font-size: 24px;">🎯 NEW MOCK INTERVIEW SESSION</h1>
+              <p style="margin: 10px 0 0 0; font-size: 16px;">Action Required - Interviewer Needed</p>
+            </div>
+            
+            <div style="padding: 20px; background: #f8fafc;">
+              <h2 style="color: #1e40af; margin-top: 0;">📋 Interview Details:</h2>
+              <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <p><strong>👤 Job Role:</strong> ${interviewData?.jobRole || 'Not specified'}</p>
+                <p><strong>📝 Job Description:</strong> ${interviewData?.jobDesc || 'Not specified'}</p>
+                <p><strong>⏱️ Experience:</strong> ${interviewData?.experience || 'Not specified'} years</p>
+                <p><strong>🏠 Room Name:</strong> <code style="background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${roomName}</code></p>
+              </div>
+              
+              <div style="background: #dbeafe; border: 2px solid #2563eb; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+                <h3 style="color: #1e40af; margin-top: 0;">🎥 JOIN INTERVIEW ROOM</h3>
+                <p style="font-size: 16px; margin-bottom: 15px;"><strong>Click the button below to join the interview:</strong></p>
+                <a href="${roomUrl}" target="_blank" style="display: inline-block; background: #2563eb; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px; margin: 10px;">
+                  🚀 JOIN INTERVIEW NOW
+                </a>
+                <p style="font-size: 12px; color: #6b7280; margin-top: 10px;">
+                  Or copy this link: <a href="${roomUrl}" target="_blank" style="color: #2563eb;">${roomUrl}</a>
+                </p>
+              </div>
+              
+              <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                <h4 style="color: #92400e; margin-top: 0;">📋 Interview Instructions:</h4>
+                <ol style="margin: 10px 0; padding-left: 20px;">
+                  <li>Click the "JOIN INTERVIEW NOW" button above</li>
+                  <li>Allow camera and microphone access when prompted</li>
+                  <li>Wait for the candidate to join the room</li>
+                  <li>Conduct the interview using professional standards</li>
+                  <li>Provide constructive feedback after the interview</li>
+                </ol>
+              </div>
+              
+              <div style="background: #dcfce7; border: 1px solid #22c55e; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                <h4 style="color: #166534; margin-top: 0;">⏰ Important Notes:</h4>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                  <li>This is a live mock interview session</li>
+                  <li>The candidate has already paid and is waiting</li>
+                  <li>Please join within 5-10 minutes of receiving this email</li>
+                  <li>If you cannot conduct this interview, please respond immediately</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div style="background: #f3f4f6; padding: 15px; border-radius: 0 0 8px 8px; text-align: center;">
+              <p style="margin: 0; color: #6b7280; font-size: 14px;">
+                Best regards,<br>
+                <strong>AI-PREPIFY Team</strong><br>
+                <em>Professional Mock Interview Platform</em>
+              </p>
+            </div>
+          </div>
+        `
+      };
+      
+      await API.post('/email/send-interviewer-email', emailData);
+      console.log('Interviewer email sent successfully');
+    } catch (error) {
+      console.error('Failed to send interviewer email:', error);
+    }
+  };
+
+  const handleSubmit = async e => {
     e.preventDefault();
     setSuccess(true);
-    setTimeout(onClose, 2000);
+    
+    // Generate a unique room name for the interview
+    const uniqueRoomName = `MockInterview-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    setRoomName(uniqueRoomName);
+    
+    // Send email to interviewer
+    await sendInterviewerEmail(uniqueRoomName);
+    
+    // Store interview data in backend
+    try {
+      const interviewRecord = {
+        title: interviewData?.jobRole || 'Live Mock Interview',
+        role: interviewData?.jobDesc || '',
+        company: '',
+        notes: '',
+        questions: [],
+        yearsOfExperience: interviewData?.experience || 0,
+        skills: [],
+        specialist: true,
+        humanSpecialist: true,
+        roomName: uniqueRoomName,
+        status: 'scheduled',
+        scheduledAt: new Date().toISOString()
+      };
+      
+      const response = await API.post('/interviews', interviewRecord);
+      console.log('Interview record created:', response.data);
+      
+      // Navigate directly to video room after 2 seconds
+      setTimeout(() => {
+        navigate(`/live-interview/${uniqueRoomName}`);
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to create interview record:', error);
+      // Still navigate to video room even if record creation fails
+      setTimeout(() => {
+        navigate(`/live-interview/${uniqueRoomName}`);
+      }, 2000);
+    }
   };
+
+  const handleEndInterview = () => {
+    setShowVideoRoom(false);
+    onClose();
+  };
+
+  if (showVideoRoom) {
+    return <LiveInterviewRoom roomName={roomName} onEndInterview={handleEndInterview} />;
+  }
 
   if (!open) return null;
   return (
@@ -53,7 +181,12 @@ const PaymentModal = ({ open, plan, onClose, onBack }) => {
           </ul>
         </div>
         {success ? (
-          <div className="text-green-600 font-bold text-center py-8">Payment Successful! Closing...</div>
+          <div className="text-center py-8">
+            <div className="text-green-600 font-bold mb-4">Payment Successful!</div>
+            <div className="text-gray-600 mb-4">Preparing your live interview room...</div>
+            <div className="text-sm text-gray-500 mb-4">Interviewer will be notified automatically</div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <input name="name" value={form.name} onChange={handleChange} required placeholder="Name on Card" className="w-full border rounded px-3 py-2" />
@@ -79,7 +212,7 @@ const PaymentModal = ({ open, plan, onClose, onBack }) => {
 };
 
 // SubscriptionPlans: accept an optional onBack prop to control back navigation
-const SubscriptionPlans = ({ open, onClose, onBack }) => {
+const SubscriptionPlans = ({ open, onClose, onBack, interviewData }) => {
   const [paymentPlan, setPaymentPlan] = useState(null);
   if (!open) return null;
   const details = planDetails.Single;
@@ -120,6 +253,7 @@ const SubscriptionPlans = ({ open, onClose, onBack }) => {
         plan={paymentPlan}
         onClose={() => setPaymentPlan(null)}
         onBack={onBack ? () => { setPaymentPlan(null); onBack(); } : () => setPaymentPlan(null)}
+        interviewData={interviewData}
       />
     </>
   );

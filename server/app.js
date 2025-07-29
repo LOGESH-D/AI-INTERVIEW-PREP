@@ -59,6 +59,9 @@ try {
   app.use('/api/contacts', require('./routes/contacts'));
   console.log('✅ Contact routes loaded');
   
+  app.use('/api/email', require('./routes/email'));
+  console.log('✅ Email routes loaded');
+  
   // Temporarily disable profile routes to fix core functionality
   // app.use('/api/profile', require('./routes/profile'));
   // console.log('✅ Profile routes loaded');
@@ -72,7 +75,7 @@ app.get('/', (req, res) => {
   res.json({ 
     message: 'AI Mock Interview API is running!',
     timestamp: new Date().toISOString(),
-    routes: ['/api/auth', '/api/interviews', '/api/questions', '/api/contacts']
+    routes: ['/api/auth', '/api/interviews', '/api/questions', '/api/contacts', '/api/email']
   });
 });
 

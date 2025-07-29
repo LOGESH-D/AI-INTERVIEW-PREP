@@ -58,7 +58,21 @@ router.get('/:id', auth, async (req, res) => {
 // Create new interview
 router.post('/', auth, async (req, res) => {
   try {
-    const { title, role, company, notes, questions, yearsOfExperience, skills } = req.body;
+    const { 
+      title, 
+      role, 
+      company, 
+      notes, 
+      questions, 
+      yearsOfExperience, 
+      skills,
+      specialist,
+      humanSpecialist,
+      roomName,
+      status,
+      scheduledAt
+    } = req.body;
+    
     // Create the interview first
     const interview = new Interview({
       user: req.userId,
@@ -67,13 +81,18 @@ router.post('/', auth, async (req, res) => {
       company,
       notes,
       yearsOfExperience,
-      skills
+      skills,
+      specialist: specialist || false,
+      humanSpecialist: humanSpecialist || false,
+      roomName,
+      status: status || 'pending',
+      scheduledAt: scheduledAt ? new Date(scheduledAt) : null
     });
     await interview.save();
 
-    // Create Question documents and link them
+    // Create Question documents and link them (only for non-live interviews)
     let questionIds = [];
-    if (Array.isArray(questions)) {
+    if (Array.isArray(questions) && questions.length > 0) {
       for (const q of questions) {
         const questionDoc = new Question({
           text: typeof q === 'string' ? q : q.text,
@@ -87,6 +106,7 @@ router.post('/', auth, async (req, res) => {
     }
     interview.questions = questionIds;
     await interview.save();
+    
     // Populate questions for response
     await interview.populate('questions');
     res.status(201).json(interview);
@@ -114,6 +134,36 @@ router.put('/:id', auth, async (req, res) => {
     res.json(interview);
   } catch (error) {
     console.error('Update interview error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Patch interview (for live interview updates)
+router.patch('/:id', auth, async (req, res) => {
+  try {
+    const updateData = { ...req.body };
+    
+    // Convert date strings to Date objects if present
+    if (updateData.completedAt) {
+      updateData.completedAt = new Date(updateData.completedAt);
+    }
+    if (updateData.scheduledAt) {
+      updateData.scheduledAt = new Date(updateData.scheduledAt);
+    }
+    
+    const interview = await Interview.findOneAndUpdate(
+      { _id: req.params.id, user: req.userId },
+      updateData,
+      { new: true }
+    );
+    
+    if (!interview) {
+      return res.status(404).json({ message: 'Interview not found' });
+    }
+    
+    res.json(interview);
+  } catch (error) {
+    console.error('Patch interview error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
