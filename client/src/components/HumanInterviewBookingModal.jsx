@@ -3,6 +3,7 @@ import SubscriptionPlans from './SubscriptionPlans';
 
 const HumanInterviewBookingModal = ({ open, onClose, onBook }) => {
   const [form, setForm] = useState({
+    userName: '',
     jobRole: '',
     jobDesc: '',
     experience: '',
@@ -16,7 +17,7 @@ const HumanInterviewBookingModal = ({ open, onClose, onBook }) => {
   
   const handleSubmit = e => {
     e.preventDefault();
-    if (!form.jobRole || !form.jobDesc || !form.experience) {
+    if (!form.userName || !form.jobRole || !form.jobDesc || !form.experience) {
       setError('Please fill in all fields.');
       return;
     }
@@ -41,6 +42,10 @@ const HumanInterviewBookingModal = ({ open, onClose, onBook }) => {
           <h2 className="text-2xl font-extrabold text-[#3b3bb3] mb-1">Book Interview with Recruitment Specialist</h2>
           <p className="text-gray-600 mb-6">Fill in the details to book your live session with a recruitment specialist!</p>
           <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block font-semibold text-[#3b3bb3] mb-1">Your Full Name</label>
+              <input name="userName" value={form.userName} onChange={handleChange} required className="w-full border-2 border-[#6366f1] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#3b3bb3] bg-white text-gray-900 transition" placeholder="Ex. John Doe" />
+            </div>
             <div>
               <label className="block font-semibold text-[#3b3bb3] mb-1">Job Role/Job Position</label>
               <input name="jobRole" value={form.jobRole} onChange={handleChange} required className="w-full border-2 border-[#6366f1] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#3b3bb3] bg-white text-gray-900 transition" placeholder="Ex. Frontend Developer" />

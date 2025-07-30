@@ -29,7 +29,10 @@ if (!process.env.JWT_SECRET) {
 }
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow client origin
+  credentials: true
+}));
 app.use(express.json());
 
 // ✅ MongoDB Connection
@@ -62,9 +65,12 @@ try {
   app.use('/api/email', require('./routes/email'));
   console.log('✅ Email routes loaded');
   
-  // Temporarily disable profile routes to fix core functionality
-  // app.use('/api/profile', require('./routes/profile'));
-  // console.log('✅ Profile routes loaded');
+  app.use('/api/profile', require('./routes/profile'));
+  console.log('✅ Profile routes loaded');
+  
+  // Serve uploaded files statically
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+  console.log('✅ Uploads directory served');
 } catch (error) {
   console.error('❌ Error loading routes:', error);
   process.exit(1);
@@ -75,8 +81,29 @@ app.get('/', (req, res) => {
   res.json({ 
     message: 'AI Mock Interview API is running!',
     timestamp: new Date().toISOString(),
-    routes: ['/api/auth', '/api/interviews', '/api/questions', '/api/contacts', '/api/email']
+    routes: ['/api/auth', '/api/interviews', '/api/questions', '/api/contacts', '/api/email', '/api/profile']
   });
+});
+
+// Test uploads directory
+app.get('/test-uploads', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  const uploadsDir = path.join(__dirname, 'uploads');
+  
+  try {
+    const files = fs.readdirSync(uploadsDir);
+    res.json({ 
+      message: 'Uploads directory accessible',
+      files: files,
+      uploadsPath: uploadsDir
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Uploads directory error',
+      error: error.message 
+    });
+  }
 });
 
 // ✅ Health check route

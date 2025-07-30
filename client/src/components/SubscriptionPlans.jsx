@@ -40,6 +40,10 @@ const PaymentModal = ({ open, plan, onClose, onBack, interviewData }) => {
     try {
       // Fix: Use the correct Jitsi Meet URL format without authentication
       const roomUrl = `https://meet.jit.si/${roomName}#config.startWithAudioMuted=false&config.startWithVideoMuted=false&config.prejoinPageEnabled=false&config.requireDisplayName=false&config.disableModeratorIndicator=true&config.enableClosePage=false&config.enableWelcomePage=false&config.enableLobbyChat=false&config.enableKnocking=false&config.enablePrejoinPage=false`;
+      
+      // Set interviewer display name
+      const interviewerName = `${interviewData?.jobRole || 'Interview'} Specialist`;
+      
       const emailData = {
         to: 'logeshofficial333@gmail.com',
         subject: '🚨 URGENT: New Mock Interview Session - Join Now',
@@ -53,10 +57,12 @@ const PaymentModal = ({ open, plan, onClose, onBack, interviewData }) => {
             <div style="padding: 20px; background: #f8fafc;">
               <h2 style="color: #1e40af; margin-top: 0;">📋 Interview Details:</h2>
               <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <p><strong>👤 Job Role:</strong> ${interviewData?.jobRole || 'Not specified'}</p>
-                <p><strong>📝 Job Description:</strong> ${interviewData?.jobDesc || 'Not specified'}</p>
+                <p><strong>👤 Candidate Name:</strong> ${interviewData?.userName || 'Not specified'}</p>
+                <p><strong>📝 Job Role:</strong> ${interviewData?.jobRole || 'Not specified'}</p>
+                <p><strong>🔧 Job Description:</strong> ${interviewData?.jobDesc || 'Not specified'}</p>
                 <p><strong>⏱️ Experience:</strong> ${interviewData?.experience || 'Not specified'} years</p>
                 <p><strong>🏠 Room Name:</strong> <code style="background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${roomName}</code></p>
+                <p><strong>👨‍💼 Your Display Name:</strong> <code style="background: #dbeafe; padding: 2px 6px; border-radius: 4px; color: #1e40af;">${interviewerName}</code></p>
               </div>
               
               <div style="background: #dbeafe; border: 2px solid #2563eb; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
@@ -88,6 +94,8 @@ const PaymentModal = ({ open, plan, onClose, onBack, interviewData }) => {
                   <li>The candidate has already paid and is waiting</li>
                   <li>Please join within 5-10 minutes of receiving this email</li>
                   <li>If you cannot conduct this interview, please respond immediately</li>
+                  <li><strong>Your display name will be: ${interviewerName}</strong></li>
+                  <li><strong>Candidate's display name will be: ${interviewData?.userName || 'Candidate'}</strong></li>
                 </ul>
               </div>
             </div>
@@ -143,13 +151,25 @@ const PaymentModal = ({ open, plan, onClose, onBack, interviewData }) => {
       
       // Navigate directly to video room after 2 seconds
       setTimeout(() => {
-        navigate(`/live-interview/${uniqueRoomName}`);
+        navigate(`/live-interview/${uniqueRoomName}`, {
+          state: {
+            userDisplayName: interviewData?.userName || 'Candidate',
+            jobRole: interviewData?.jobRole || 'Interview',
+            isInterviewer: false
+          }
+        });
       }, 2000);
     } catch (error) {
       console.error('Failed to create interview record:', error);
       // Still navigate to video room even if record creation fails
       setTimeout(() => {
-        navigate(`/live-interview/${uniqueRoomName}`);
+        navigate(`/live-interview/${uniqueRoomName}`, {
+          state: {
+            userDisplayName: interviewData?.userName || 'Candidate',
+            jobRole: interviewData?.jobRole || 'Interview',
+            isInterviewer: false
+          }
+        });
       }, 2000);
     }
   };

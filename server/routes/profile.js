@@ -98,7 +98,7 @@ router.post('/photo', auth, upload.single('photo'), async (req, res) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
     
-    const photoUrl = `/uploads/${req.file.filename}`;
+    const photoUrl = `http://localhost:5000/uploads/${req.file.filename}`;
     
     const user = await User.findByIdAndUpdate(
       req.user.userId,
@@ -120,7 +120,7 @@ router.post('/resume', auth, upload.single('resume'), async (req, res) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
     
-    const resumeUrl = `/uploads/${req.file.filename}`;
+    const resumeUrl = `http://localhost:5000/uploads/${req.file.filename}`;
     
     const user = await User.findByIdAndUpdate(
       req.user.userId,
@@ -138,46 +138,89 @@ router.post('/resume', auth, upload.single('resume'), async (req, res) => {
 // Get user test statistics and history
 router.get('/test-stats', auth, async (req, res) => {
   try {
-    // Get user with test stats
-    const user = await User.findById(req.user.userId).select('testStats');
-    
-    // Get completed interviews with scores
+    // Get all completed interviews for the user
     const interviews = await Interview.find({
       user: req.user.userId,
-      status: 'completed',
-      score: { $exists: true, $ne: null }
+      status: 'completed'
     })
-    .select('title role score report createdAt')
-    .sort({ createdAt: -1 })
-    .limit(10);
+    .select('title role score report createdAt completedAt')
+    .sort({ createdAt: -1 });
     
-    // Calculate additional statistics
+    // Calculate comprehensive statistics
     const totalInterviews = interviews.length;
-    const recentScores = interviews.slice(0, 5).map(i => i.score);
-    const averageRecentScore = recentScores.length > 0 
-      ? recentScores.reduce((sum, score) => sum + score, 0) / recentScores.length 
+    const scoredInterviews = interviews.filter(i => i.score !== null && i.score !== undefined);
+    const totalScore = scoredInterviews.reduce((sum, interview) => sum + interview.score, 0);
+    const averageScore = scoredInterviews.length > 0 ? totalScore / scoredInterviews.length : 0;
+    const bestScore = scoredInterviews.length > 0 ? Math.max(...scoredInterviews.map(i => i.score)) : 0;
+    
+    // Calculate recent performance (last 5 interviews)
+    const recentInterviews = scoredInterviews.slice(0, 5);
+    const recentAverageScore = recentInterviews.length > 0 
+      ? recentInterviews.reduce((sum, interview) => sum + interview.score, 0) / recentInterviews.length 
       : 0;
     
+    // Calculate improvement trend
+    const improvementTrend = calculateImprovementTrend(scoredInterviews);
+    
+    // Get detailed test history
     const testHistory = interviews.map(interview => ({
       id: interview._id,
       title: interview.title,
       role: interview.role,
-      score: interview.score,
-      date: interview.createdAt,
-      report: interview.report
+      score: interview.score || 0,
+      date: interview.completedAt || interview.createdAt,
+      report: interview.report,
+      duration: interview.duration || 0
     }));
     
+    // Update user's test statistics in database
+    const updatedStats = {
+      totalTests: totalInterviews,
+      averageScore: Math.round(averageScore * 10) / 10,
+      bestScore: Math.round(bestScore * 10) / 10,
+      lastTestDate: interviews.length > 0 ? interviews[0].createdAt : null
+    };
+    
+    await User.findByIdAndUpdate(req.user.userId, {
+      testStats: updatedStats
+    });
+    
     res.json({
-      stats: user.testStats,
+      stats: updatedStats,
       totalInterviews,
-      averageRecentScore: Math.round(averageRecentScore * 10) / 10,
-      testHistory
+      averageRecentScore: Math.round(recentAverageScore * 10) / 10,
+      improvementTrend,
+      testHistory: testHistory.slice(0, 10), // Show last 10 interviews
+      performanceBreakdown: {
+        excellent: scoredInterviews.filter(i => i.score >= 8).length,
+        good: scoredInterviews.filter(i => i.score >= 6 && i.score < 8).length,
+        average: scoredInterviews.filter(i => i.score >= 4 && i.score < 6).length,
+        needsImprovement: scoredInterviews.filter(i => i.score < 4).length
+      }
     });
   } catch (error) {
     console.error('Error fetching test stats:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+// Helper function to calculate improvement trend
+function calculateImprovementTrend(interviews) {
+  if (interviews.length < 2) return 'insufficient_data';
+  
+  const sortedInterviews = interviews.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  const firstHalf = sortedInterviews.slice(0, Math.floor(sortedInterviews.length / 2));
+  const secondHalf = sortedInterviews.slice(Math.floor(sortedInterviews.length / 2));
+  
+  const firstHalfAvg = firstHalf.reduce((sum, i) => sum + i.score, 0) / firstHalf.length;
+  const secondHalfAvg = secondHalf.reduce((sum, i) => sum + i.score, 0) / secondHalf.length;
+  
+  const improvement = secondHalfAvg - firstHalfAvg;
+  
+  if (improvement > 1) return 'improving';
+  if (improvement < -1) return 'declining';
+  return 'stable';
+}
 
 // Serve uploaded files
 router.get('/uploads/:filename', (req, res) => {

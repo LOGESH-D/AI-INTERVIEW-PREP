@@ -378,7 +378,6 @@ const Questions = () => {
       (async () => {
         setReportLoading(true);
         const results = [];
-        let total = 0;
         let aiErrors = 0;
         const skillsList = interview.skills && interview.skills.length ? interview.skills : [];
         
@@ -491,7 +490,6 @@ const Questions = () => {
             }
           }
           
-          total += score;
           results.push({ 
             question: q, 
             user, 
@@ -510,22 +508,40 @@ const Questions = () => {
           });
         }
         
+        // Calculate overall score as average of all 5 skills
+        const skillTotals = results.reduce((acc, item) => {
+          acc.contentAccuracy += item.score; // Content accuracy is the individual question score
+          acc.communication += item.skillAnalysis.communication;
+          acc.grammar += item.skillAnalysis.grammar;
+          acc.attitude += item.skillAnalysis.attitude;
+          acc.softSkills += item.skillAnalysis.softSkills;
+          return acc;
+        }, { contentAccuracy: 0, communication: 0, grammar: 0, attitude: 0, softSkills: 0 });
+
+        const numQuestions = results.length;
+        const overallScore = numQuestions > 0 ? 
+          Math.round(((skillTotals.contentAccuracy / numQuestions) + 
+                     (skillTotals.communication / numQuestions) + 
+                     (skillTotals.grammar / numQuestions) + 
+                     (skillTotals.attitude / numQuestions) + 
+                     (skillTotals.softSkills / numQuestions)) / 5 * 10) / 10 : 0;
+
         setReport(results);
-        setOverallScore(results.length ? Math.round((total / results.length) * 10) / 10 : 0);
+        setOverallScore(overallScore);
         setReportLoading(false);
         
         // Save to backend
         try {
           await API.post(`/interviews/${id}/report`, { 
             report: results, 
-            overallScore: results.length ? Math.round((total / results.length) * 10) / 10 : 0,
-            skillAnalysis: results.reduce((acc, item) => {
-              acc.communication += item.skillAnalysis.communication;
-              acc.grammar += item.skillAnalysis.grammar;
-              acc.attitude += item.skillAnalysis.attitude;
-              acc.softSkills += item.skillAnalysis.softSkills;
-              return acc;
-            }, { communication: 0, grammar: 0, attitude: 0, softSkills: 0 })
+            overallScore: overallScore,
+            skillAnalysis: {
+              contentAccuracy: Math.round(skillTotals.contentAccuracy / numQuestions * 10) / 10,
+              communication: Math.round(skillTotals.communication / numQuestions * 10) / 10,
+              grammar: Math.round(skillTotals.grammar / numQuestions * 10) / 10,
+              attitude: Math.round(skillTotals.attitude / numQuestions * 10) / 10,
+              softSkills: Math.round(skillTotals.softSkills / numQuestions * 10) / 10
+            }
           });
         } catch (e) {
           console.error('Failed to save report to backend:', e);
@@ -568,8 +584,27 @@ const Questions = () => {
                 "No answer provided. Please provide a detailed response to the question."
             };
           });
+          
+          // Calculate overall score for fallback results using the same 5-skill average
+          const fallbackSkillTotals = fallbackResults.reduce((acc, item) => {
+            acc.contentAccuracy += item.score;
+            acc.communication += item.skillAnalysis.communication;
+            acc.grammar += item.skillAnalysis.grammar;
+            acc.attitude += item.skillAnalysis.attitude;
+            acc.softSkills += item.skillAnalysis.softSkills;
+            return acc;
+          }, { contentAccuracy: 0, communication: 0, grammar: 0, attitude: 0, softSkills: 0 });
+
+          const fallbackNumQuestions = fallbackResults.length;
+          const fallbackOverallScore = fallbackNumQuestions > 0 ? 
+            Math.round(((fallbackSkillTotals.contentAccuracy / fallbackNumQuestions) + 
+                       (fallbackSkillTotals.communication / fallbackNumQuestions) + 
+                       (fallbackSkillTotals.grammar / fallbackNumQuestions) + 
+                       (fallbackSkillTotals.attitude / fallbackNumQuestions) + 
+                       (fallbackSkillTotals.softSkills / fallbackNumQuestions)) / 5 * 10) / 10 : 0;
+
           setReport(fallbackResults);
-          setOverallScore(fallbackResults.reduce((sum, item) => sum + item.score, 0) / fallbackResults.length);
+          setOverallScore(fallbackOverallScore);
           setReportLoading(false);
         }
         

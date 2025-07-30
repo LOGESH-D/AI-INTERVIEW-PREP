@@ -19,16 +19,18 @@ const InterviewReport = ({ report, overallScore, reportLoading, interview }) => 
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Calculate average skill scores
+  // Calculate average skill scores including Content Accuracy
   const avgSkills = report.length > 0 ? report.reduce((acc, item) => {
+    acc.contentAccuracy += item.score; // Individual question score represents content accuracy
     acc.communication += item.skillAnalysis.communication;
     acc.grammar += item.skillAnalysis.grammar;
     acc.attitude += item.skillAnalysis.attitude;
     acc.softSkills += item.skillAnalysis.softSkills;
     return acc;
-  }, { communication: 0, grammar: 0, attitude: 0, softSkills: 0 }) : { communication: 0, grammar: 0, attitude: 0, softSkills: 0 };
+  }, { contentAccuracy: 0, communication: 0, grammar: 0, attitude: 0, softSkills: 0 }) : { contentAccuracy: 0, communication: 0, grammar: 0, attitude: 0, softSkills: 0 };
 
   if (report.length > 0) {
+    avgSkills.contentAccuracy = Math.round(avgSkills.contentAccuracy / report.length * 10) / 10;
     avgSkills.communication = Math.round(avgSkills.communication / report.length * 10) / 10;
     avgSkills.grammar = Math.round(avgSkills.grammar / report.length * 10) / 10;
     avgSkills.attitude = Math.round(avgSkills.attitude / report.length * 10) / 10;
@@ -105,7 +107,7 @@ const InterviewReport = ({ report, overallScore, reportLoading, interview }) => 
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#f8fafc] to-[#e0e7ff] py-8 px-2">
       <h1 className="text-2xl md:text-3xl font-extrabold mb-4">Interview Feedback & Report</h1>
       {reportLoading ? (
-        <div className="text-lg text-[#3b3bb3] font-semibold">Generating your report...</div>
+        <div className="text-lg text-[#3b3bb3] font-semibold">Generating your report, it will take a time please wait...</div>
       ) : (
         <div className="w-full max-w-4xl bg-white rounded-xl shadow p-6">
           {/* Tab Navigation */}
@@ -159,7 +161,7 @@ const InterviewReport = ({ report, overallScore, reportLoading, interview }) => 
                         {
                           label: 'Your Scores',
                           data: [
-                            overallScore,
+                            avgSkills.contentAccuracy,
                             avgSkills.communication,
                             avgSkills.grammar,
                             avgSkills.attitude,
@@ -199,7 +201,7 @@ const InterviewReport = ({ report, overallScore, reportLoading, interview }) => 
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="font-semibold">Content Accuracy</span>
-                      <span className="font-bold text-blue-600">{overallScore}/10</span>
+                      <span className="font-bold text-blue-600">{avgSkills.contentAccuracy}/10</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="font-semibold">Communication</span>

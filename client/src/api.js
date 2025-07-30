@@ -63,4 +63,30 @@ API.interceptors.response.use(
   }
 );
 
+// Profile API functions
+export const profileAPI = {
+  // Get user profile
+  getProfile: () => API.get('/profile'),
+  
+  // Update user profile
+  updateProfile: (profileData) => API.put('/profile', profileData),
+  
+  // Upload profile photo
+  uploadPhoto: (formData) => API.post('/profile/photo', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
+  
+  // Upload resume
+  uploadResume: (formData) => API.post('/profile/resume', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
+  
+  // Get test statistics and history
+  getTestStats: () => API.get('/profile/test-stats'),
+};
+
 export default API; 
