@@ -2,7 +2,7 @@ import React from 'react';
 import { FaDownload } from 'react-icons/fa';
 import { formatDate } from '../utils/interviews';
 
-const InterviewCard = ({ interview, onFeedbackClick, onDownloadClick, onStartClick, onDeleteClick }) => (
+const InterviewCard = ({ interview, onFeedbackClick, onDownloadClick, onStartClick, onDeleteClick, showFeedback = true, showDownload = true }) => (
   <div className="bg-white rounded-xl shadow border border-gray-200 p-5 flex flex-col justify-between min-h-[180px] hover:shadow-lg transition-all duration-200">
     <div>
       <h3 className="text-lg font-bold text-[#3b3bb3] mb-1">{interview.title}</h3>
@@ -12,13 +12,15 @@ const InterviewCard = ({ interview, onFeedbackClick, onDownloadClick, onStartCli
       <p className="text-gray-400 text-xs mt-1">Created At: {formatDate(interview.createdAt)}</p>
     </div>
     <div className="flex gap-2 mt-4">
-      <button
-        className="border border-[#3b3bb3] text-[#3b3bb3] font-semibold px-4 py-2 rounded-lg hover:bg-[#3b3bb3] hover:text-white transition-colors duration-200"
-        onClick={onFeedbackClick}
-      >
-        Feedback
-      </button>
-      {interview.status === 'completed' && (
+      {showFeedback && (
+        <button
+          className="border border-[#3b3bb3] text-[#3b3bb3] font-semibold px-4 py-2 rounded-lg hover:bg-[#3b3bb3] hover:text-white transition-colors duration-200"
+          onClick={onFeedbackClick}
+        >
+          Feedback
+        </button>
+      )}
+      {showDownload && interview.status === 'completed' && (
         <button
           className="border border-green-600 text-green-600 font-semibold px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors duration-200 flex items-center text-sm"
           title="Download PDF"

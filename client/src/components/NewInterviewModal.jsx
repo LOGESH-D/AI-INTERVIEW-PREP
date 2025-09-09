@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generateInterviewQuestions } from '../utils/gemini';
+import { generateInterviewData } from '../utils/gemini';
 
 const NewInterviewModal = ({ open, onClose, onStart }) => {
   const [jobPosition, setJobPosition] = useState('');
@@ -10,28 +10,45 @@ const NewInterviewModal = ({ open, onClose, onStart }) => {
 
   const handleStart = async (e) => {
     e.preventDefault();
+    
+    // Prevent multiple simultaneous requests
+    if (loading) {
+      return;
+    }
+    
     setError('');
     setLoading(true);
+    
     try {
-      // Generate questions with AI
-      const prompt = `Generate 5 interview questions only (no introduction, no explanations, no numbering, just the questions, each on a new line) for a candidate applying for the following job:\nPosition: ${jobPosition}\nDescription: ${jobDesc}\nExperience: ${jobExperience} years.`;
-      const aiText = await generateInterviewQuestions(prompt);
-      const aiQuestions = aiText.split('\n').filter(q => q.trim()).map(q => q.replace(/^[0-9]+[.)]?\s*/, ''));
-      // Fetch relevant skills from AI
-      const skillsPrompt = `List the top 5-10 relevant skills for this job role and description as a comma-separated list.\nJob Role: ${jobPosition}\nJob Description: ${jobDesc}`;
-      const skillsText = await generateInterviewQuestions(skillsPrompt);
-      const aiSkills = skillsText.split(',').map(s => s.trim()).filter(Boolean);
+      // Generate both questions and skills with AI in a single request
+      const { questions: aiQuestions, ideals: aiIdeals, skills: aiSkills } = await generateInterviewData(
+        jobPosition, 
+        jobDesc, 
+        jobExperience
+      );
+      
       onStart({
         jobPosition,
         jobDesc,
         jobExperience,
-        questions: aiQuestions.length ? aiQuestions : [aiText],
+        questions: aiQuestions,
+        ideals: aiIdeals,
         skills: aiSkills
       });
     } catch (err) {
-      setError('Failed to generate questions or skills. Please try again.');
+      console.error('Failed to generate interview data:', err);
+      
+      // Provide more specific error messages
+      if (err.message.includes('429')) {
+        setError('Too many requests. Please wait a moment and try again.');
+      } else if (err.message.includes('Max retries reached')) {
+        setError('Service is temporarily busy. Please try again in a few minutes.');
+      } else {
+        setError('Failed to generate questions or skills. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (!open) return null;
@@ -57,7 +74,17 @@ const NewInterviewModal = ({ open, onClose, onStart }) => {
           {error && <div className="text-red-500 text-center font-semibold">{error}</div>}
           <div className="flex justify-end gap-2 mt-4">
             <button type="button" className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition" onClick={onClose}>Cancel</button>
-            <button type="submit" className="bg-[#3b3bb3] text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-[#23237a] transition-all" disabled={loading}>{loading ? 'Starting...' : 'Start Interview'}</button>
+            <button 
+              type="submit" 
+              className={`px-6 py-2 rounded-lg font-bold shadow transition-all ${
+                loading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-[#3b3bb3] hover:bg-[#23237a]'
+              } text-white`} 
+              disabled={loading}
+            >
+              {loading ? 'Generating...' : 'Start Interview'}
+            </button>
           </div>
         </form>
       </div>

@@ -64,6 +64,7 @@ router.post('/', auth, async (req, res) => {
       company, 
       notes, 
       questions, 
+      ideals,
       yearsOfExperience, 
       skills,
       specialist,
@@ -93,10 +94,13 @@ router.post('/', auth, async (req, res) => {
     // Create Question documents and link them (only for non-live interviews)
     let questionIds = [];
     if (Array.isArray(questions) && questions.length > 0) {
-      for (const q of questions) {
+      for (let idx = 0; idx < questions.length; idx++) {
+        const q = questions[idx];
+        const idealAnswer = Array.isArray(ideals) ? ideals[idx] : undefined;
         const questionDoc = new Question({
           text: typeof q === 'string' ? q : q.text,
           category: role || '',
+          answer: typeof idealAnswer === 'string' ? idealAnswer : undefined,
           user: req.userId,
           interview: interview._id
         });

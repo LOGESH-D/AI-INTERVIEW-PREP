@@ -43,6 +43,8 @@ const Questions = () => {
   const [videoURL, setVideoURL] = useState(null);
   const [cameraStream, setCameraStream] = useState(null);
   const videoRef = useRef(null);
+  // Prevent duplicate initialization in React StrictMode
+  const ranInitRef = useRef(false);
   
   // Speech recognition state
   const [speechRecognition, setSpeechRecognition] = useState(null);
@@ -168,8 +170,8 @@ const Questions = () => {
         }
       };
 
-      // Check AI status first
-      const aiWorking = await checkAIStatus();
+      // Check AI status only in development to avoid hitting rate limits
+      const aiWorking = import.meta.env.MODE === 'development' ? await checkAIStatus() : true;
       if (!aiWorking) {
         console.warn('AI service may not be working properly');
       }
@@ -232,8 +234,10 @@ const Questions = () => {
     }
   }, []);
 
-  // Initialize interview
+  // Initialize interview (guard against StrictMode double-invoke)
   useEffect(() => {
+    if (ranInitRef.current) return;
+    ranInitRef.current = true;
     testAPI();
   }, [id]);
 
@@ -396,16 +400,21 @@ const Questions = () => {
             softSkills: 5
           };
           
-          // Get ideal answer
+          // Get ideal answer: prefer stored ideal from backend, fallback to AI
           try {
-            ideal = await getIdealAnswer(q);
+            const presetIdeal = interview.questions[i]?.answer;
+            if (presetIdeal && presetIdeal.trim().length > 0) {
+              ideal = presetIdeal;
+            } else {
+              ideal = await getIdealAnswer(q);
+            }
           } catch (e) {
-            console.error('Ideal answer generation failed for question:', q, e);
+            console.error('Ideal answer retrieval failed for question:', q, e);
             ideal = 'Unable to generate ideal answer at this time.';
             aiErrors++;
           }
           
-          // Get match score
+          // Get match score between user answer and ideal answer
           let matchScoreResult = { score: 0, missingPoints: [], similarity: 0 };
           try {
             // First check relevance

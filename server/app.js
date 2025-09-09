@@ -10,9 +10,8 @@ const cors = require('cors');
 
 const app = express();
 
-// ✅ Debug: Check if the MONGO_URI is loading properly
+// ✅ Debug: Current working directory (avoid logging secrets)
 console.log("✅ Current Working Directory:", process.cwd());
-console.log("✅ Loaded MONGO_URI:", process.env.MONGO_URI);
 
 // Check for required environment variables
 if (!process.env.MONGO_URI) {
@@ -30,7 +29,7 @@ if (!process.env.JWT_SECRET) {
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow client origin
+  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   credentials: true
 }));
 app.use(express.json());
@@ -68,6 +67,9 @@ try {
   app.use('/api/profile', require('./routes/profile'));
   console.log('✅ Profile routes loaded');
   
+  app.use('/api/gemini', require('./routes/gemini'));
+  console.log('✅ Gemini routes loaded');
+  
   // Serve uploaded files statically
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
   console.log('✅ Uploads directory served');
@@ -81,7 +83,7 @@ app.get('/', (req, res) => {
   res.json({ 
     message: 'AI Mock Interview API is running!',
     timestamp: new Date().toISOString(),
-    routes: ['/api/auth', '/api/interviews', '/api/questions', '/api/contacts', '/api/email', '/api/profile']
+    routes: ['/api/auth', '/api/interviews', '/api/questions', '/api/contacts', '/api/email', '/api/profile', '/api/gemini']
   });
 });
 

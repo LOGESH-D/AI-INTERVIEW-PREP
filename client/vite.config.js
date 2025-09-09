@@ -9,5 +9,13 @@ export default defineConfig({
     port: 5173,
     open: true,
     strictPort: true,
+    proxy: {
+      // Forward API calls to the backend during development
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 })

@@ -241,6 +241,8 @@ const Interviews = () => {
               <InterviewCard
                 key={interview._id}
                 interview={interview}
+                showFeedback={false}
+                showDownload={false}
                 onFeedbackClick={async () => {
                   try {
                     const res = await API.get(`/interviews/${interview._id}/report`);

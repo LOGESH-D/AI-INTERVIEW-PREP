@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Prefer env override for API base; fallback to localhost for dev
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: API_BASE_URL,
   timeout: 10000, // 10 second timeout
 });
 
