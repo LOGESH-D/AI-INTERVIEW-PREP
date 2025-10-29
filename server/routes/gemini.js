@@ -2,9 +2,30 @@ const express = require('express');
 const router = express.Router();
 
 // Gemini API configuration (must be provided via environment)
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+function getGeminiApiKey(raw) {
+  if (!raw) return raw;
+  // If the env mistakenly contains the full REST URL, extract the key query param
+  try {
+    if (raw.includes('generativelanguage.googleapis.com')) {
+      const url = new URL(raw);
+      const key = url.searchParams.get('key');
+      return key || raw;
+    }
+    // If it contains key=... as a plain string
+    const keyIdx = raw.indexOf('key=');
+    if (keyIdx !== -1) {
+      return raw.substring(keyIdx + 4).trim();
+    }
+  } catch (_) {
+    // fall through to return raw
+  }
+  return raw.trim();
+}
+
+const GEMINI_API_KEY = getGeminiApiKey(process.env.GEMINI_API_KEY);
 const GEMINI_MODEL = process.env.GENERATIVE_LANGUAGE_MODEL || 'gemini-1.5-flash';
 const GEMINI_API_VERSION = process.env.GENERATIVE_LANGUAGE_API_VERSION || 'v1beta';
+const MOCK_GEMINI = String(process.env.MOCK_GEMINI || '').toLowerCase() === 'true';
 
 // Use global endpoint (no regional prefix). Regional endpoints are not supported
 function buildGeminiUrl(version = GEMINI_API_VERSION) {
@@ -65,6 +86,40 @@ async function waitForRateLimit() {
   lastRequestTime = Date.now();
 }
 
+function generateMockInterviewData(jobPosition, jobDesc, jobExperience) {
+  const role = (jobPosition || 'Software Engineer').trim();
+  const stack = (jobDesc || '').trim();
+  const yrs = Number(jobExperience || 1);
+  const xpBand = yrs <= 2 ? 'junior' : yrs <= 5 ? 'mid-level' : 'senior';
+
+  const questions = [
+    `Describe a ${xpBand} approach to building a ${role} feature using ${stack}.`,
+    `How would you debug a production issue in a ${role} service using ${stack}?`,
+    `Explain trade-offs between two designs you might use in ${stack} for ${role}.`,
+    `Walk through how you would test and deploy a ${role} change safely.`,
+    `How do you ensure performance and scalability for ${role} systems with ${stack}?`
+  ];
+
+  const ideals = [
+    `Outline problem framing, constraints, iterative delivery, and cite ${stack} specifics with clear rationale.`,
+    `Discuss observability (logs, metrics, traces), rollback plans, and root-cause analysis with ${stack} tools.`,
+    `Compare complexity, reliability, and cost; justify selection with context relevant to ${role}.`,
+    `Describe layered tests (unit, integration, e2e), CI gating, and progressive rollout strategies.`,
+    `Address profiling, caching, data access patterns, and capacity planning aligned to expected load.`
+  ];
+
+  const skills = [
+    role,
+    ...stack.split(/[\,\n]/).map(s => s.trim()).filter(Boolean).slice(0, 5),
+    'Problem Solving',
+    'System Design',
+    'Testing',
+    'Communication'
+  ];
+
+  return { questions, ideals, skills: Array.from(new Set(skills)) };
+}
+
 // Generate interview questions endpoint
 router.post('/generate-questions', async (req, res) => {
   try {
@@ -94,27 +149,26 @@ router.post('/generate-questions', async (req, res) => {
     console.log(`Making Gemini API call with prompt:`, prompt.substring(0, 100) + '...');
     console.log(`Using global endpoint, model: ${GEMINI_MODEL}, version: ${GEMINI_API_VERSION}`);
 
-    const response = await callGeminiWithFallback(body);
+    let response;
+    try {
+      response = await callGeminiWithFallback(body);
+    } catch (err) {
+      if (MOCK_GEMINI || String(err.message).includes('RESOURCE_EXHAUSTED') || String(err.message).includes('429')) {
+        const mock = generateMockInterviewData('Role', prompt || '', 2);
+        return res.json({ success: true, result: mock.questions.join('\n'), mock: true });
+      }
+      throw err;
+    }
 
     console.log('Gemini API response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Gemini API error response:', errorText);
-      
-      if (response.status === 429) {
-        // Graceful fallback when rate limited
-        const genericQuestions = [
-          'Tell me about yourself and your experience relevant to this role.',
-          'Describe a challenging project you worked on. What was your approach?',
-          'How do you prioritize tasks when deadlines are tight?',
-          'Explain a time you received critical feedback and how you handled it.',
-          'Why are you interested in this position and our company?'
-        ];
-        const genericSkills = ['Communication','Problem Solving','Teamwork','Time Management','Adaptability'];
-        return res.status(200).json({ success: true, questions: genericQuestions, skills: genericSkills, fallback: true });
+      if (MOCK_GEMINI || errorText.includes('RESOURCE_EXHAUSTED') || errorText.includes('429')) {
+        const mock = generateMockInterviewData('Role', prompt || '', 2);
+        return res.json({ success: true, result: mock.questions.join('\n'), mock: true });
       }
-      
       return res.status(response.status).json({
         success: false,
         error: `Gemini API error: ${response.status}`,
@@ -135,10 +189,7 @@ router.post('/generate-questions', async (req, res) => {
       });
     }
     
-    res.json({
-      success: true,
-      result: result
-    });
+    res.json({ success: true, result });
 
   } catch (error) {
     console.error('Gemini API call failed:', error);
@@ -201,23 +252,26 @@ SKILLS:
     console.log(`Making Gemini API call for interview data generation`);
     console.log(`Using global endpoint, model: ${GEMINI_MODEL}, version: ${GEMINI_API_VERSION}`);
 
-    const response = await callGeminiWithFallback(body);
+    let response;
+    try {
+      response = await callGeminiWithFallback(body);
+    } catch (err) {
+      if (MOCK_GEMINI || String(err.message).includes('RESOURCE_EXHAUSTED') || String(err.message).includes('429')) {
+        const mock = generateMockInterviewData(jobPosition, jobDesc, jobExperience);
+        return res.json({ success: true, ...mock, mock: true });
+      }
+      throw err;
+    }
 
     console.log('Gemini API response status:', response.status);
-
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Gemini API error response:', errorText);
-      // Graceful fallback for rate limits or any upstream error
-      const genericQuestions = [
-        'Tell me about yourself and your experience relevant to this role.',
-        'Describe a challenging project you worked on. What was your approach?',
-        'How do you prioritize tasks when deadlines are tight?',
-        'Explain a time you received critical feedback and how you handled it.',
-        'Why are you interested in this position and our company?'
-      ];
-      const genericSkills = ['Communication','Problem Solving','Teamwork','Time Management','Adaptability'];
-      return res.status(200).json({ success: true, questions: genericQuestions, skills: genericSkills, fallback: true });
+      if (MOCK_GEMINI || errorText.includes('RESOURCE_EXHAUSTED') || errorText.includes('429')) {
+        const mock = generateMockInterviewData(jobPosition, jobDesc, jobExperience);
+        return res.json({ success: true, ...mock, mock: true });
+      }
+      return res.status(response.status).json({ success: false, error: 'Gemini API error', details: errorText });
     }
 
     const data = await response.json();
@@ -233,50 +287,57 @@ SKILLS:
       });
     }
     
-    // Parse the combined response including ideal answers
-    const sectionAfterQuestions = result.split('QUESTIONS:')[1] || '';
-    const questionsSection = sectionAfterQuestions.split('IDEAL_ANSWERS:')[0] || '';
-    const sectionAfterIdeals = sectionAfterQuestions.split('IDEAL_ANSWERS:')[1] || '';
-    const idealSection = sectionAfterIdeals.split('SKILLS:')[0] || '';
-    const skillsSection = (sectionAfterIdeals.includes('SKILLS:') ? sectionAfterIdeals.split('SKILLS:')[1] : result.split('SKILLS:')[1]) || '';
+    // Parse the combined response including ideal answers (robust to casing and bullets)
+    const lower = result.toLowerCase();
+    const idxQ = lower.indexOf('questions:');
+    const idxI = lower.indexOf('ideal_answers:');
+    const idxS = lower.indexOf('skills:');
 
-    const normalizeQuestion = (q) => q.replace(/^[0-9]+[.)]?\s*/, '').trim();
+    const take = (start, end) => (start >= 0 ? result.substring(start, end >= 0 ? end : undefined) : '');
 
-    const questions = questionsSection
-      .split('\n')
-      .map(s => s.trim())
+    const questionsRaw = take(idxQ >= 0 ? idxQ + 'questions:'.length : -1, idxI);
+    const idealsRaw = take(idxI >= 0 ? idxI + 'ideal_answers:'.length : -1, idxS);
+    const skillsRaw = take(idxS >= 0 ? idxS + 'skills:'.length : -1, -1);
+
+    const stripBullet = (s) => s
+      .replace(/^[-*]\s+/, '')
+      .replace(/^[0-9]+[.)]?\s+/, '')
+      .trim();
+
+    const splitLines = (s) => s
+      .split(/\r?\n/)
+      .map(v => v.trim())
       .filter(Boolean)
-      .map(normalizeQuestion);
+      .map(stripBullet);
 
-    const ideals = idealSection
-      .split('\n')
-      .map(s => s.trim())
-      .filter(Boolean);
-
-    const skills = skillsSection
+    let questions = splitLines(questionsRaw);
+    let ideals = splitLines(idealsRaw);
+    let skills = skillsRaw
+      .replace(/\n/g, ' ')
       .split(',')
-      .map(s => s.trim())
+      .map(v => v.trim())
       .filter(Boolean);
 
-    // Ensure we have pairs of question/ideal of equal length
-    const minLen = Math.min(questions.length, ideals.length);
-    const qOut = questions.slice(0, minLen);
-    const iOut = ideals.slice(0, minLen);
+    // Fallback: if questions came as a markdown list without labels
+    if (questions.length === 0 && idxQ === -1 && idxI === -1) {
+      questions = splitLines(result);
+    }
 
-    return res.json({ success: true, questions: qOut, ideals: iOut, skills });
+    // Align lengths
+    const minLen = Math.min(questions.length, ideals.length || questions.length);
+    questions = questions.slice(0, minLen);
+    ideals = ideals.slice(0, minLen);
+
+    return res.json({ success: true, questions, ideals, skills });
 
   } catch (error) {
     console.error('Gemini API call failed:', error);
-    // Final safety net fallback to avoid empty/500 responses to client
-    const genericQuestions = [
-      'Tell me about yourself and your experience relevant to this role.',
-      'Describe a challenging project you worked on. What was your approach?',
-      'How do you prioritize tasks when deadlines are tight?',
-      'Explain a time you received critical feedback and how you handled it.',
-      'Why are you interested in this position and our company?'
-    ];
-    const genericSkills = ['Communication','Problem Solving','Teamwork','Time Management','Adaptability'];
-    return res.status(200).json({ success: true, questions: genericQuestions, skills: genericSkills, fallback: true });
+    if (MOCK_GEMINI || String(error.message).includes('RESOURCE_EXHAUSTED') || String(error.message).includes('429')) {
+      const { jobPosition, jobDesc, jobExperience } = req.body || {};
+      const mock = generateMockInterviewData(jobPosition, jobDesc, jobExperience);
+      return res.json({ success: true, ...mock, mock: true });
+    }
+    return res.status(502).json({ success: false, error: 'Failed to generate interview data', details: error.message });
   }
 });
 
